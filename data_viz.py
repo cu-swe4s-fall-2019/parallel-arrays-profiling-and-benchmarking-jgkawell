@@ -1,5 +1,5 @@
 import os
-import math_lib as ml
+import statistics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -34,8 +34,8 @@ def boxplot(L, out_file_name):
         raise FileExistsError("That file name already exists.")
 
     # Find mean and stdev using math_lib library
-    mean = ml.list_mean(L)
-    stdev = ml.list_stdev(L)
+    mean = statistics.mean(L)
+    stdev = statistics.pstdev(L)
 
     # Create and save the plot
     plt.boxplot(L)
@@ -67,8 +67,8 @@ def histogram(L, out_file_name):
         raise FileExistsError("That file name already exists.")
 
     # Find mean and stdev using math_lib library
-    mean = ml.list_mean(L)
-    stdev = ml.list_stdev(L)
+    mean = statistics.mean(L)
+    stdev = statistics.pstdev(L)
 
     # Create and save the plot
     plt.hist(L)
@@ -101,8 +101,8 @@ def combo(L, out_file_name):
         raise FileExistsError("That file name already exists.")
 
     # Find mean and stdev using math_lib library
-    mean = ml.list_mean(L)
-    stdev = ml.list_stdev(L)
+    mean = statistics.mean(L)
+    stdev = statistics.pstdev(L)
 
     # Set the global title
     plt.title("mean: " + str(mean) + " stdev: " + str(stdev))
