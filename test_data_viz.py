@@ -34,9 +34,11 @@ class TestMathLib(unittest.TestCase):
         rand_int_list = []
         length = range(0, 10)
         for i in length:
-            rand_int_list.append([random.randrange(-1000, 1000) for i in range(1000)])
+            rand_int_list.append(
+                [random.randrange(-100, 100) for i in range(100)])
 
-        data_viz.boxplot(rand_int_list, file_name, data_labels=[i for i in length])
+        data_viz.boxplot(
+            rand_int_list, file_name, data_labels=[i for i in length])
 
         self.assertEqual(os.path.exists(file_name), True)
 

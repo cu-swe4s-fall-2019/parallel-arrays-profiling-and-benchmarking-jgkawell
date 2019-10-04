@@ -13,7 +13,9 @@ of the two.
 """
 
 
-def boxplot(data, out_file_name="boxplot.png", title="Data", x_label="Column Number", y_label="Value", data_labels=[]):
+def boxplot(data, out_file_name="p.png",
+            title="", x_label="", y_label="", data_labels=[],
+            fig_size=(1, 1), dpi=250):
     """
     Creates and saves a boxplot of the data given
     in a 1D numeric list. Mean and standard deviation
@@ -47,11 +49,12 @@ def boxplot(data, out_file_name="boxplot.png", title="Data", x_label="Column Num
         print("WARNING: different number of labels than data columns")
 
     # Create and save the plot
+    fig = plt.figure(figsize=fig_size, dpi=dpi)
     plt.boxplot(data)
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.xticks(label_num, data_labels)
+    plt.xticks(label_num, data_labels, rotation='vertical')
     plt.savefig(out_file_name, bbox_inches="tight")
     plt.close()
 
