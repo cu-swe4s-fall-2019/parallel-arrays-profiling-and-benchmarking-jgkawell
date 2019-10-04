@@ -29,6 +29,19 @@ class TestMathLib(unittest.TestCase):
 
         os.remove(file_name)
 
+    def test_boxplot_random_int_array_2d(self):
+        file_name = "test.png"
+        rand_int_list = []
+        length = range(0, 10)
+        for i in length:
+            rand_int_list.append([random.randrange(-1000, 1000) for i in range(1000)])
+
+        data_viz.boxplot(rand_int_list, file_name, data_labels=[i for i in length])
+
+        self.assertEqual(os.path.exists(file_name), True)
+
+        os.remove(file_name)
+
     def test_boxplot_random_double_array(self):
         file_name = "test.png"
         rand_double_list = [random.random() for i in range(1000)]
