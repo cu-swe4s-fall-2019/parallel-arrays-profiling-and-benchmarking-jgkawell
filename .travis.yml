@@ -12,4 +12,5 @@ before_install:
     - conda install --yes python=3.6
 
 script:
-    - echo "No tests yet"
+    - python test_data_viz.py
+    - ./functional_testing.sh
