@@ -3,6 +3,10 @@ import gzip
 import data_viz
 import argparse
 
+"""
+This script enables the user to plot gene data from an input file
+and save the plot to an output file.
+"""
 
 parser = argparse.ArgumentParser(
     description='Plot a gene data visualization from a file.')
@@ -34,6 +38,20 @@ parser.add_argument(
 
 
 def linear_search(key, array):
+    """
+    Searches through the given array for the key
+    using the linear search algorithm.
+
+    Parameters
+    ----------
+    key : the element to search for
+    array : the array of elements through which to search
+
+    Returns
+    ----------
+    index : int that is either the index of the key
+            or -1 signifying search failure
+    """
 
     for i in range(len(array)):
         curr = array[i]
@@ -43,6 +61,20 @@ def linear_search(key, array):
 
 
 def binary_search(key, array):
+    """
+    Searches through the given array for the key
+    using the binary search algorithm.
+
+    Parameters
+    ----------
+    key : the element to search for
+    array : the array of elements through which to search
+
+    Returns
+    ----------
+    index : int that is either the index of the key
+            or -1 signifying search failure
+    """
 
     lo = -1
     hi = len(array)
@@ -61,6 +93,21 @@ def binary_search(key, array):
 
 
 def get_sample_info(sample_file, group_col_name):
+    """
+    Gets the group and member information of the a
+    sample gene file based on the group name.
+
+    Parameters
+    ----------
+    sample_file : the data file to parse
+    group_col_name : the group name
+
+    Returns
+    ----------
+    groups : a list of group names
+    members : a list of group members
+    """
+
     sample_id_col_name = 'SAMPID'
     samples = []
     sample_info_header = None
@@ -94,6 +141,23 @@ def get_sample_info(sample_file, group_col_name):
 
 
 def get_group_counts(data_file_name, gene_name, groups, members, search_type):
+    """
+    Gets the group counts based on the gene name from the
+    given data file. Also allows you to specify the search type.
+
+    Parameters
+    ----------
+    data_file_name : the data file to parse
+    gene_name : the gene name to search for
+    groups : a list of group names
+    members : a list of group members
+    search_type : the search type (binary/linear)
+
+    Returns
+    ----------
+    group_counts : a list of group counts
+    """
+
     version = None
     dim = None
     data_header = None
@@ -139,6 +203,9 @@ def get_group_counts(data_file_name, gene_name, groups, members, search_type):
 
 
 def main():
+    """
+    Runs all the needed functions.
+    """
 
     # Parse args and read in data from the files
     args = parser.parse_args()
