@@ -2,6 +2,10 @@ import sys
 import gzip
 import data_viz
 import argparse
+sys.path.insert(1, "./hash-tables-jgkawell/")
+from hash_tables import *  # noqa: E402
+from hash_functions import *  # noqa: E402
+
 
 """
 This script enables the user to plot gene data from an input file
@@ -35,6 +39,11 @@ parser.add_argument(
     type=str,
     default='b',
     help='The search type (b=binary, l=linear)')
+parser.add_argument(
+    '--use_hash',
+    type=str,
+    default='True',
+    help='Whether or not to use hash tables (True/False)')
 
 
 def linear_search(key, array):
@@ -140,6 +149,51 @@ def get_sample_info(sample_file, group_col_name):
     return groups, members
 
 
+def get_sample_info_hash(sample_file, group_col_name):
+    """
+    Gets the group and member information of the a
+    sample gene file based on the group name using a hash table.
+
+    Parameters
+    ----------
+    sample_file : the data file to parse
+    group_col_name : the group name
+
+    Returns
+    ----------
+    hash_table : a hash table where keys are group names and values
+            are lists of group members
+    """
+
+    sample_id_col_name = 'SAMPID'
+    samples = []
+    sample_info_header = None
+    for l in open(sample_file):
+        if sample_info_header is None:
+            sample_info_header = l.rstrip().split('\t')
+        else:
+            samples.append(l.rstrip().split('\t'))
+
+    group_col_idx = sample_info_header.index(group_col_name)
+    sample_id_col_idx = sample_info_header.index(sample_id_col_name)
+
+    # Use the linear probe hash table using ASCII function
+    hash_table = LinearProbe(1000, h_ascii)
+
+    for row_idx in range(len(samples)):
+        sample = samples[row_idx]
+        sample_name = sample[sample_id_col_idx]
+        curr_group = sample[group_col_idx]
+
+        value = hash_table.search(curr_group)
+        if value is None:
+            hash_table.add(curr_group, [sample_name])
+        else:
+            value.append(sample_name)
+
+    return hash_table
+
+
 def get_group_counts(data_file_name, gene_name, groups, members, search_type):
     """
     Gets the group counts based on the gene name from the
@@ -202,6 +256,72 @@ def get_group_counts(data_file_name, gene_name, groups, members, search_type):
     return group_counts
 
 
+def get_group_counts_hash(data_file_name, gene_name, hash_table, search_type):
+    """
+    Gets the group counts based on the gene name from the
+    given data file. Also allows you to specify the search type.
+
+    Parameters
+    ----------
+    data_file_name : the data file to parse
+    gene_name : the gene name to search for
+    hash_table : a hash table where keys are group names and values
+            are lists of group members
+    search_type : the search type (binary/linear)
+
+    Returns
+    ----------
+    group_counts : a list of group counts
+    """
+
+    version = None
+    dim = None
+    data_header = None
+    gene_name_col = 1
+    group_counts = [[] for i in range(len(hash_table.key_list))]
+
+    for l in gzip.open(data_file_name, 'rt'):
+        if version is None:
+            version = l
+            continue
+
+        if dim is None:
+            dim = [int(x) for x in l.rstrip().split()]
+            continue
+
+        if data_header is None:
+            data_header = []
+            i = 0
+            for field in l.rstrip().split('\t'):
+                data_header.append([field, i])
+                i += 1
+            data_header.sort(key=lambda tup: tup[0])
+
+            continue
+
+        A = l.rstrip().split('\t')
+
+        if A[gene_name_col] == gene_name:
+            group_idx = 0
+            for key in hash_table.key_list:
+                for member in hash_table.search(key):
+                    if search_type == 'b':
+                        member_idx = binary_search(member, data_header)
+                    elif search_type == 'l':
+                        member_idx = linear_search(member, data_header)
+                    else:
+                        print(f"ERROR: Invalid search type ({search_type})")
+                        sys.exit(1)
+                    if member_idx != -1:
+                        group_counts[group_idx].append(int(A[member_idx]))
+
+                group_idx += 1
+
+            break
+
+    return group_counts
+
+
 def main():
     """
     Runs all the needed functions.
@@ -210,13 +330,28 @@ def main():
     # Parse args and read in data from the files
     args = parser.parse_args()
 
-    # Get the data from the sample file
-    groups, members = get_sample_info(
-        args.sample_attributes, args.group_type)
+    # Use hash or not
+    use_hash = eval(args.use_hash)
 
-    # Get the data from the gene read file
-    group_counts = get_group_counts(
-        args.gene_reads, args.gene, groups, members, args.search_type)
+    if use_hash:
+        # Get the data from the sample file
+        hash_table = get_sample_info_hash(
+            args.sample_attributes, args.group_type)
+
+        # Get the data from the gene read file
+        group_counts = get_group_counts_hash(
+            args.gene_reads, args.gene, hash_table, args.search_type)
+
+        # Assign groups list
+        groups = hash_table.key_list
+    else:
+        # Get the data from the sample file
+        groups, members = get_sample_info(
+            args.sample_attributes, args.group_type)
+
+        # Get the data from the gene read file
+        group_counts = get_group_counts(
+            args.gene_reads, args.gene, groups, members, args.search_type)
 
     # Plot the data
     try:
