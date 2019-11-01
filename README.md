@@ -11,7 +11,7 @@ The project is meant to be used by calling `plot_gtex.py` from the terminal. The
 usage: plot_gtex.py [-h] [--gene_reads GENE_READS]
                     [--sample_attributes SAMPLE_ATTRIBUTES] [--gene GENE]
                     [--group_type GROUP_TYPE] [--output_file OUTPUT_FILE]
-                    [--search_type SEARCH_TYPE]
+                    [--search_type SEARCH_TYPE] [--use_hash USE_HASH]
 
 Plot a gene data visualization from a file.
 
@@ -28,6 +28,7 @@ optional arguments:
                         The file name for the plot
   --search_type SEARCH_TYPE
                         The search type (b=binary, l=linear)
+  --use_hash USE_HASH   Whether or not to use hash tables (True/False)
 ```
 
 So you can simply run the program by calling:
@@ -42,6 +43,8 @@ You will then be given a plot in the output file you have chosen that will look 
 
 ## Profiling/Benchmarking
 This project demonstrates the importance of a good search algorithm for large datasets. By profiling the Python script, I fould that the linear search took almost 16sec of total time while the binary search took less than 0.1sec of total time. This demonstrates the massive time savings by using a good search algorithm with this type of dataset.
+
+Additionally, I benchmarked the program using hashing vs no hashing and found that hashing was marginally slower than no hashing. The average was about 0.048s slower with the hash tables enabled. I did some profiling and noted that this difference was due to calling the search function in my hash table with over 23k calls to that search function.
 
 
 ## Installation
